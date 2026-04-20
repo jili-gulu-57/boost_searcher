@@ -1,7 +1,11 @@
+#pragma once
 // 工具类
+
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
+#include <boost/algorithm/string.hpp>
 
 namespace ns_util
 {
@@ -26,6 +30,14 @@ namespace ns_util
 
             in.close();
             return true;
+        }
+    };
+    class StringUtil
+    {
+    public:
+        static void CutString(const std::string &target, std::vector<std::string> *out, std::string sep)
+        {
+            boost::split(*out, target, boost::is_any_of("\3"), boost::token_compress_on);
         }
     };
 } // namespace ns_util
