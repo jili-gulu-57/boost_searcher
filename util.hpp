@@ -37,7 +37,7 @@ namespace ns_util
     class StringUtil
     {
     public:
-        static void CutString(const std::string &target, std::vector<std::string> *out, std::string sep)
+        static void Split(const std::string &target, std::vector<std::string> *out, std::string sep)
         {
             boost::split(*out, target, boost::is_any_of("\3"), boost::token_compress_on);
         }

@@ -53,8 +53,8 @@ namespace ns_index
     public:
         static Index *GetInstance()
         {
-            //双重加锁，保证对象创建安全
-            if(nullptr==instance)
+            // 双重加锁，保证对象创建安全
+            if (nullptr == instance)
             {
                 mtx.lock();
                 if (nullptr == instance)
@@ -88,8 +88,10 @@ namespace ns_index
         }
 
         // 根据清洗后的数据，构建正排倒排索引
+
         bool BuildIndex(const std::string &input)
         {
+            static int count = 0;
             std::ifstream in(input, std::ios::in | std::ios::binary);
             if (!in.is_open())
             {
@@ -107,6 +109,12 @@ namespace ns_index
                     continue;
                 }
                 BulidInvertedIndex(*doc);
+
+                count++;
+                if (count % 100 == 0)
+                {
+                    std::cout << "索引构建成功：" << count << std::endl;
+                }
             }
             return true;
         }
@@ -117,7 +125,7 @@ namespace ns_index
             // 1.解析字符串：title，content，url
             std::vector<std::string> results;
             const std::string SEP = "\3";
-            ns_util::StringUtil::CutString(line, &results, SEP);
+            ns_util::StringUtil::Split(line, &results, SEP);
             if (results.size() != 3)
             {
                 return nullptr;
@@ -178,4 +186,5 @@ namespace ns_index
         }
     };
     Index *Index::instance = nullptr;
+    std::mutex Index::mtx;
 }
