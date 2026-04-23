@@ -13,6 +13,9 @@ namespace ns_searcher
         ns_index::Index *index;
 
     public:
+        Searcher(){}
+        ~ Searcher(){}
+        
         void InitSearcher(const std::string &input)
         {
             // 1.创建index对象

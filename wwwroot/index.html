@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的像素世界</title>
+    <!-- 引入 NES.css 像素风格框架 -->
+    <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
+    <!-- 引入复古像素字体 -->
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #212529;
+            /* 深色背景，保护视力 */
+            font-family: 'Press Start 2P', cursive;
+            /* 全局像素字体 */
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* 自定义一些 NES.css 的间距 */
+        .nes-container {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .pixel-btn {
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        h1 {
+            color: #ffcb38;
+            /* 复古黄 */
+            text-shadow: 4px 4px #d35400;
+            /* 阴影效果 */
+            margin: 20px 0;
+        }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            image-rendering: pixelated;
+            /* 保持图片像素清晰，不模糊 */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- 头部区域 -->
+        <header class="nes-container with-title is-rounded is-dark">
+            <h2 class="title">欢迎来到我的主页</h2>
+            <p>这里是一个简易的像素风格网页示例。</p>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <div class="nes-container is-rounded is-dark">
+            <div class="nes-balloon from-left is-rounded">
+                <p>你好！我是 AI 助手。<br>这是我为你生成的代码。</p>
+            </div>
+
+            <hr class="nes-line">
+
+            <p>这个页面使用了 <b>NES.css</b> 框架，你可以轻松修改里面的文字。</p>
+
+            <!-- 按钮组 -->
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="button" class="nes-btn is-warning pixel-btn">开始冒险</button>
+                <button type="button" class="nes-btn is-error pixel-btn">关于我</button>
+                <button type="button" class="nes-btn is-primary pixel-btn">联系我</button>
+            </div>
+        </div>
+
+        <!-- 底部区域 -->
+        <footer class="nes-container is-rounded is-dark" style="text-align: center; font-size: 10px; color: #888;">
+            <p>wq的测试代码</p>
+        </footer>
+    </div>
+
+</body>
+
+</html>
