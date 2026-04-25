@@ -4,26 +4,37 @@
 #include "util.hpp"
 #include <algorithm>
 #include <jsoncpp/json/json.h>
+#include <unordered_map>
 
 namespace ns_searcher
 {
+    struct InvertedElemPrint
+    {
+        u_int64_t doc_id;
+        int weight;
+        std::vector<std::string> words;
+        InvertedElemPrint() : doc_id(0), weight(0) {}
+    };
+
     class Searcher
     {
     private:
         ns_index::Index *index;
 
     public:
-        Searcher(){}
-        ~ Searcher(){}
-        
+        Searcher() {}
+        ~Searcher() {}
+
         void InitSearcher(const std::string &input)
         {
             // 1.创建index对象
             index = ns_index::Index::GetInstance();
-            std::cout << "建立Index对象成功" << std::endl;
+            // std::cout << "建立Index对象成功" << std::endl;
+            LOG(NORMAL, "建立Index对象成功");
             // 2.构建索引(将硬盘里的索引文件加载到内存里)
             index->BuildIndex(input);
-            std::cout << "构建索引成功" << std::endl;
+            // std::cout << "构建索引成功" << std::endl;
+            LOG(NORMAL, "构建索引成功");
         }
 
         // query:用户的搜索需求 json_string:返回的搜索结果
@@ -34,7 +45,12 @@ namespace ns_searcher
             ns_util::JiebaUtil::CutString(query, &words);
 
             // 2.【触发】:根据query分出来的词，进行index查找
-            ns_index::InvertedList inverted_list_all;
+            // ns_index::InvertedList inverted_list_all;
+
+            std::vector<InvertedElemPrint> inverted_list_all;
+            // 对不同单词匹配到同一doc_id去重
+            std::unordered_map<u_int64_t, InvertedElemPrint> tokens_map;
+
             for (auto &word : words)
             {
                 boost::to_lower(word); // 先将分词转换为小写，因为存储的就是小写
@@ -44,7 +60,20 @@ namespace ns_searcher
                 {
                     continue;
                 }
-                inverted_list_all.insert(inverted_list_all.end(), inverted_list->begin(), inverted_list->end());
+                // inverted_list_all.insert(inverted_list_all.end(), inverted_list->begin(), inverted_list->end());
+
+                for (const auto &elem : *inverted_list)
+                {
+                    auto &item = tokens_map[elem.doc_id];
+                    item.doc_id = elem.doc_id;
+                    item.weight += elem.weight;
+                    item.words.push_back(elem.word);
+                }
+            }
+
+            for (const auto &item : tokens_map)
+            {
+                inverted_list_all.push_back(std::move(item.second));
             }
 
             // 3.【合并排序】:汇总查找结果，对结果按weight（权重）进行降序排序
@@ -54,8 +83,13 @@ namespace ns_searcher
                 json_string->clear();
                 return;
             }
+            // std::sort(inverted_list_all.begin(), inverted_list_all.end(),
+            //           [](const ns_index::InvertedElem &e1, const ns_index::InvertedElem &e2)
+            //           {
+            //               return e1.weight > e2.weight;
+            //           });
             std::sort(inverted_list_all.begin(), inverted_list_all.end(),
-                      [](const ns_index::InvertedElem &e1, const ns_index::InvertedElem &e2)
+                      [](const InvertedElemPrint &e1, const InvertedElemPrint &e2)
                       {
                           return e1.weight > e2.weight;
                       });
@@ -70,14 +104,16 @@ namespace ns_searcher
                 }
                 Json::Value elem;
                 elem["title"] = doc->title;
-                elem["desc"] = GetDesc(doc->content, item.word);
+                elem["desc"] = GetDesc(doc->content, item.words[0]);
                 elem["url"] = doc->url;
                 elem["weight"] = item.weight;
+                elem["id"] = doc->doc_id;
 
                 root.append(elem);
             }
             // 将root序列化
-            Json::StyledWriter writer;
+            // Json::StyledWriter writer;
+            Json::FastWriter writer;
             *json_string = writer.write(root);
         }
 
@@ -106,7 +142,7 @@ namespace ns_searcher
             if (start >= end)
                 return "None2";
 
-            return html_content.substr(start, end - start);
+            return html_content.substr(start, end - start) + "...";
         }
     };
 }

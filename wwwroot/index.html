@@ -1,69 +1,71 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的像素世界</title>
-    <!-- 引入 NES.css 像素风格框架 -->
-    <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
-    <!-- 引入复古像素字体 -->
-    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+     引入 NES.css 像素风格框架 
+<link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
+ 引入复古像素字体 -->
+<!--
+<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
 
-    <style>
-        body {
-            background-color: #212529;
-            /* 深色背景，保护视力 */
-            font-family: 'Press Start 2P', cursive;
-            /* 全局像素字体 */
-            color: #fff;
-            padding: 20px;
-        }
+<style>
+    body {
+        background-color: #212529;
+        /* 深色背景，保护视力 */
+        font-family: 'Press Start 2P', cursive;
+        /* 全局像素字体 */
+        color: #fff;
+        padding: 20px;
+    }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    }
 
-        /* 自定义一些 NES.css 的间距 */
-        .nes-container {
-            margin-bottom: 20px;
-            text-align: left;
-        }
+    /* 自定义一些 NES.css 的间距 */
+    .nes-container {
+        margin-bottom: 20px;
+        text-align: left;
+    }
 
-        .pixel-btn {
-            margin-top: 10px;
-            cursor: pointer;
-        }
+    .pixel-btn {
+        margin-top: 10px;
+        cursor: pointer;
+    }
 
-        h1 {
-            color: #ffcb38;
-            /* 复古黄 */
-            text-shadow: 4px 4px #d35400;
-            /* 阴影效果 */
-            margin: 20px 0;
-        }
+    h1 {
+        color: #ffcb38;
+        /* 复古黄 */
+        text-shadow: 4px 4px #d35400;
+        /* 阴影效果 */
+        margin: 20px 0;
+    }
 
-        .avatar {
-            width: 64px;
-            height: 64px;
-            image-rendering: pixelated;
-            /* 保持图片像素清晰，不模糊 */
-        }
-    </style>
+    .avatar {
+        width: 64px;
+        height: 64px;
+        image-rendering: pixelated;
+        /* 保持图片像素清晰，不模糊 */
+    }
+</style>
 </head>
+
 
 <body>
 
     <div class="container">
-        <!-- 头部区域 -->
-        <header class="nes-container with-title is-rounded is-dark">
-            <h2 class="title">欢迎来到我的主页</h2>
+        头部区域 -->
+<!-- <header class="nes-container with-title is-rounded is-dark">
+            <h2 class="title">欢迎来到我的搜索引擎</h2>
             <p>这里是一个简易的像素风格网页示例。</p>
         </header>
 
-        <!-- 主要内容区域 -->
+        主要内容区域
         <div class="nes-container is-rounded is-dark">
             <div class="nes-balloon from-left is-rounded">
                 <p>你好！我是 AI 助手。<br>这是我为你生成的代码。</p>
@@ -73,7 +75,7 @@
 
             <p>这个页面使用了 <b>NES.css</b> 框架，你可以轻松修改里面的文字。</p>
 
-            <!-- 按钮组 -->
+            按钮组
             <div style="text-align: center; margin-top: 20px;">
                 <button type="button" class="nes-btn is-warning pixel-btn">开始冒险</button>
                 <button type="button" class="nes-btn is-error pixel-btn">关于我</button>
@@ -81,12 +83,207 @@
             </div>
         </div>
 
-        <!-- 底部区域 -->
-        <footer class="nes-container is-rounded is-dark" style="text-align: center; font-size: 10px; color: #888;">
+        底部区域 -->
+<!-- <footer class="nes-container is-rounded is-dark" style="text-align: center; font-size: 10px; color: #888;">
             <p>wq的测试代码</p>
         </footer>
     </div>
 
+</body> 
+
+</html>  -->
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+    <title>for test</title>
+    <style>
+        * {
+            /* 清除页面所有元素的默认外边距（margin）和内边距（padding） */
+            margin: 0;
+            /*设置外边距*/
+            padding: 0;
+            /*设置内边距*/
+        }
+
+        html,
+        /*将body内的内容100%和html呈现的吻合*/
+        body {
+            height: 100%;
+        }
+
+        /*类选择器 .container*/
+        .container {
+            /* 设置div的宽度 */
+            width: 500px;
+            /* 设置外边距达到居中对齐的效果 */
+            margin: 0px auto;
+            /* 设置外边距的上边距 */
+            margin-top: 60px;
+        }
+
+        /* 复合选择器，选中container下的search */
+        .container .search {
+            width: 600px;
+            height: 52px;
+        }
+
+        /* 选中input标签 */
+        .container .search input {
+            width: 400px;
+            height: 50px;
+            /* 边框属性：宽度、样式、颜色 */
+            border: 1px solid black;
+            /* 设置里面字体左边距 */
+            padding-left: 5px;
+            /* 设置里面字体颜色 */
+            color: rgb(75, 73, 73);
+            /* 设置搜索框边框的圆润程度 */
+            border-radius: 10px;
+            /* 数值越大越圆，高度的一半通常最圆润 */
+            /* outline: none; */
+            /* 去掉点击时的默认黑框/蓝框，更美观 */
+        }
+
+        /* 选择button标签，设置属性 */
+        .container .search button {
+            width: 120px;
+            height: 52px;
+            margin: 0px;
+            vertical-align: top;
+            /* 设置button颜色 */
+            background-color: rgb(206, 132, 157);
+            /* 设置字体颜色 */
+            color: #f1efef;
+            /* 设置字体大小 */
+            font-size: 25px;
+            /* 设置字体样式 */
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            border-radius: 10px;
+            outline: none;
+
+        }
+
+        .container .result {
+            width: 100%;
+        }
+
+        .container .result .item {
+            margin-top: 15px;
+        }
+
+        .container .result .item a {
+            /* 去掉a标签的下划线 */
+            text-decoration: none;
+            /* 设置a标签字体大小 */
+            font-size: 20px;
+            /* 设置颜色 */
+            color: rgb(54, 154, 200);
+        }
+
+        .container .result .item a:hover {
+            text-decoration: underline;
+        }
+
+
+        .container .result .item p {
+            margin-bottom: 5px;
+        }
+
+        .container .result .item i {
+            font-style: normal;
+            color: rgb(104, 124, 141);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="search">
+            <input type="text" value="输入搜索关键字">
+            <button onclick="Search()">搜索</button>
+        </div>
+        <div class="result">
+
+            <!-- 硬编码网页内容 -->
+            <!-- <div class="item">
+                <a href="#">这是标题</a>
+                <p>--------这是摘要--------</p>
+                <i>https://search.gitee……</i>
+            </div>
+            <div class="item">
+                <a href="#">这是标题</a>
+                <p>--------这是摘要--------</p>
+                <i>https://search.gitee……</i>
+            </div> -->
+
+        </div>
+    </div>
+    <script>
+        function Search() {
+            // alert("hello js");
+            //1.提取数据，$可以理解成jQuery的别称
+            let query = $(".container .search input").val();
+            console.log("query=" + query);
+
+            //2.发起合http请求，ajax：一个和后端进行数据交互的函数
+            $.ajax(
+                {
+                    type: "GET",
+                    url: "/s?word=" + query,
+                    success: function (data) {
+                        console.log(data);
+                        BuildHtml(data);
+                    }
+                }
+            );
+        }
+
+        function BuildHtml(data) {
+            // 获取html中的result标签
+            let result_lable = $(".container .result");
+            //清空历史搜索结果
+            result_lable.empty();
+
+            if (data && data.length > 0) {
+                for (let elem of data) {
+                    let a_lable = $("<a>",
+                        {
+                            text: elem.title,
+                            href: elem.url,
+                            target: "_blank"
+                        });
+                    let p_lable = $("<p>", {
+                        text: elem.desc
+                    });
+                    let i_lable = $("<i>",
+                        {
+                            text: elem.url
+                        }
+                    );
+                    let div_lable = $("<div>", {
+                        class: "item"
+                    });
+                    a_lable.appendTo(div_lable);
+                    p_lable.appendTo(div_lable);
+                    i_lable.appendTo(div_lable);
+                    div_lable.appendTo(result_lable);
+                }
+            }
+            else {
+                document.write("无搜索内容");
+                return;
+            }
+        }
+    </script>
 </body>
 
 </html>

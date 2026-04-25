@@ -7,6 +7,7 @@
 #include <fstream>
 #include <mutex>
 #include "util.hpp"
+#include "log.hpp"
 
 namespace ns_index
 {
@@ -113,7 +114,9 @@ namespace ns_index
                 count++;
                 if (count % 100 == 0)
                 {
-                    std::cout << "索引构建成功：" << count << std::endl;
+                    // std::cout << "索引构建成功：" << count << std::endl;
+                    std::string msg = "索引构建成功：" + std::to_string(count);
+                    LOG(NORMAL, msg);
                 }
             }
             return true;

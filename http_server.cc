@@ -18,7 +18,9 @@ int main()
                     return;
                 }
                 std::string word=req.get_param_value("word");
-                std::cout<<"用户在搜索："<<word<<std::endl;
+                // std::cout<<"用户在搜索："<<word<<std::endl;
+                std::string msg = "用户在搜索：" + word;
+                LOG(NORMAL, msg);
                 std::string json_string;
                 search.Search(word,&json_string);
                 rsp.set_content(json_string,"application/json"); });
