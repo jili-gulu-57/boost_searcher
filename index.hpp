@@ -5,7 +5,6 @@
 #include <vector>
 #include <unordered_map>
 #include <fstream>
-#include <mutex>
 #include "util.hpp"
 #include "log.hpp"
 
@@ -43,9 +42,6 @@ namespace ns_index
         Index(const Index &) = delete;            // 把拷贝构造函数显示删除，禁止通过克隆创建新对象
         Index &operator=(const Index &) = delete; // 把赋值重载运算符显示删除，禁止通过赋值产生副本
 
-        static Index *instance; // 单例化Index对象，实现节省空间和全局唯一
-        static std::mutex mtx;
-
     public:
         ~Index()
         {
@@ -54,18 +50,9 @@ namespace ns_index
     public:
         static Index *GetInstance()
         {
-            // 双重加锁，保证对象创建安全
-            if (nullptr == instance)
-            {
-                mtx.lock();
-                if (nullptr == instance)
-                {
-                    instance = new Index();
-                }
-                mtx.unlock();
-            }
-
-            return instance;
+            // C++11 guarantees thread-safe initialization of function-local statics.
+            static Index instance;
+            return &instance;
         }
         DocInfo *GetForwardIndex(u_int64_t doc_id)
         {
@@ -188,6 +175,4 @@ namespace ns_index
             return true;
         }
     };
-    Index *Index::instance = nullptr;
-    std::mutex Index::mtx;
 }

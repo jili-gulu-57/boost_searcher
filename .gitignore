@@ -1,0 +1,9 @@
+build/
+.vscode/
+cpp-httplib-0.27.0/
+debug
+http_server
+parser
+search_server
+redis_cache_demo
+test/a.out

@@ -8,8 +8,9 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <boost/algorithm/string.hpp>
+#include <cstdlib>
 #include <mutex>
-#include "jieba/Jieba.hpp"
+#include <cppjieba/Jieba.hpp>
 #include "log.hpp"
 
 namespace ns_util
@@ -47,49 +48,49 @@ namespace ns_util
         }
     };
 
-    const char *const DICT_PATH = "./dict/jieba.dict.utf8";
-    const char *const HMM_PATH = "./dict/hmm_model.utf8";
-    const char *const USER_DICT_PATH = "./dict/user.dict.utf8";
-    const char *const IDF_PATH = "./dict/idf.utf8";
-    const char *const STOP_WORD_PATH = "./dict/stop_words.utf8";
+    inline std::string DictPath(const std::string &filename)
+    {
+        const char *configured_dir = std::getenv("SEARCHER_DICT_DIR");
+        const std::string dict_dir = configured_dir ? configured_dir : "./cppjieba/dict";
+        return dict_dir + "/" + filename;
+    }
 
     class JiebaUtil
     {
     private:
         // static cppjieba::Jieba jieba;
         cppjieba::Jieba jieba;
-        // std::unordered_map<std::string, bool> stop_words;
         std::unordered_set<std::string> stop_words;
+        std::mutex cut_mutex;
 
     private:
-        JiebaUtil() : jieba(DICT_PATH, HMM_PATH, USER_DICT_PATH, IDF_PATH, STOP_WORD_PATH)
+        JiebaUtil() : jieba(
+                          DictPath("jieba.dict.utf8"),
+                          DictPath("hmm_model.utf8"),
+                          DictPath("user.dict.utf8"),
+                          DictPath("idf.utf8"),
+                          DictPath("stop_words.utf8"))
         {
         }
         JiebaUtil(const JiebaUtil &) = delete;
         JiebaUtil &operator=(const JiebaUtil &) = delete;
 
-        static JiebaUtil *instance;
-
     public:
         static JiebaUtil *get_instance()
         {
-            static std::mutex mtx;
-            if (nullptr == instance)
+            static JiebaUtil instance;
+            static const bool initialized = []()
             {
-                mtx.lock();
-                if (nullptr == instance)
-                {
-                    instance = new JiebaUtil();
-                    instance->InitJiebaUtil();
-                }
-                mtx.unlock();
-            }
-            return instance;
+                instance.InitJiebaUtil();
+                return true;
+            }();
+            (void)initialized;
+            return &instance;
         }
 
         void InitJiebaUtil()
         {
-            std::ifstream in(STOP_WORD_PATH);
+            std::ifstream in(DictPath("stop_words.utf8"));
             if (!in.is_open())
             {
                 LOG(FATAL, "load stop words file error");
@@ -106,6 +107,7 @@ namespace ns_util
 
         void CutStringHelper(const std::string &src, std::vector<std::string> *out)
         {
+            std::lock_guard<std::mutex> lock(cut_mutex);
             jieba.CutForSearch(src, *out);
             for (auto iter = out->begin(); iter != out->end();)
             {
@@ -125,7 +127,4 @@ namespace ns_util
             // jieba.CutForSearch(src, *out);
         }
     };
-    // cppjieba::Jieba JiebaUtil::jieba(DICT_PATH,HMM_PATH,USER_DICT_PATH,IDF_PATH,STOP_WORD_PATH);
-    JiebaUtil *JiebaUtil::instance = nullptr;
-
 } // namespace ns_util

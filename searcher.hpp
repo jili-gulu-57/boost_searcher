@@ -1,13 +1,42 @@
 #pragma once
 
 #include "index.hpp"
+#include "search_cache.h"
 #include "util.hpp"
 #include <algorithm>
 #include <jsoncpp/json/json.h>
+#include <memory>
 #include <unordered_map>
 
 namespace ns_searcher
 {
+    enum class SearchCacheStatus
+    {
+        Bypass,
+        Hit,
+        Miss
+    };
+
+    inline const char *SearchCacheStatusName(SearchCacheStatus status)
+    {
+        if (status == SearchCacheStatus::Hit)
+        {
+            return "HIT";
+        }
+        if (status == SearchCacheStatus::Miss)
+        {
+            return "MISS";
+        }
+        return "BYPASS";
+    }
+
+    struct SearchMetadata
+    {
+        SearchCacheStatus cache_status;
+
+        SearchMetadata() : cache_status(SearchCacheStatus::Bypass) {}
+    };
+
     struct InvertedElemPrint
     {
         u_int64_t doc_id;
@@ -20,26 +49,73 @@ namespace ns_searcher
     {
     private:
         ns_index::Index *index;
+        std::unique_ptr<ns_redis::SearchCache> search_cache;
 
     public:
-        Searcher() {}
+        Searcher()
+            : index(nullptr),
+              search_cache(new ns_redis::SearchCache(ns_redis::RedisConfig::FromEnvironment()))
+        {
+        }
         ~Searcher() {}
 
-        void InitSearcher(const std::string &input)
+        bool InitSearcher(const std::string &input)
         {
             // 1.创建index对象
             index = ns_index::Index::GetInstance();
             // std::cout << "建立Index对象成功" << std::endl;
             LOG(NORMAL, "建立Index对象成功");
             // 2.构建索引(将硬盘里的索引文件加载到内存里)
-            index->BuildIndex(input);
+            if (!index->BuildIndex(input))
+            {
+                LOG(FATAL, "构建索引失败");
+                return false;
+            }
             // std::cout << "构建索引成功" << std::endl;
             LOG(NORMAL, "构建索引成功");
+            return true;
         }
 
         // query:用户的搜索需求 json_string:返回的搜索结果
-        void Search(const std::string &query, std::string *json_string)
+        void Search(
+            const std::string &query,
+            std::string *json_string,
+            SearchMetadata *metadata = nullptr)
         {
+            if (!json_string)
+            {
+                return;
+            }
+
+            std::string cached_result;
+            const ns_redis::CacheLookupStatus lookup_status =
+                search_cache->LookupResult(query, &cached_result);
+            search_cache->RecordKeyword(query);
+
+            if (lookup_status == ns_redis::CacheLookupStatus::Hit)
+            {
+                if (metadata)
+                {
+                    metadata->cache_status = SearchCacheStatus::Hit;
+                }
+                *json_string = cached_result;
+                LOG(NORMAL, std::string("search cache HIT: ") + query);
+                return;
+            }
+
+            if (metadata)
+            {
+                metadata->cache_status =
+                    lookup_status == ns_redis::CacheLookupStatus::Miss
+                        ? SearchCacheStatus::Miss
+                        : SearchCacheStatus::Bypass;
+            }
+            LOG(
+                NORMAL,
+                std::string("search cache ") +
+                    (lookup_status == ns_redis::CacheLookupStatus::Miss ? "MISS: " : "BYPASS: ") +
+                    query);
+
             // 1.【分词】:对query进行分词
             std::vector<std::string> words;
             ns_util::JiebaUtil::CutString(query, &words);
@@ -80,7 +156,8 @@ namespace ns_searcher
             if (inverted_list_all.empty())
             {
                 std::cout << query << " 没有搜索结果" << std::endl;
-                json_string->clear();
+                *json_string = "[]";
+                search_cache->StoreResult(query, *json_string);
                 return;
             }
             // std::sort(inverted_list_all.begin(), inverted_list_all.end(),
@@ -94,7 +171,7 @@ namespace ns_searcher
                           return e1.weight > e2.weight;
                       });
             // 4.【构建】:排序后的结果构建json串
-            Json::Value root;
+            Json::Value root(Json::arrayValue);
             for (auto &item : inverted_list_all)
             {
                 ns_index::DocInfo *doc = index->GetForwardIndex(item.doc_id);
@@ -115,6 +192,14 @@ namespace ns_searcher
             // Json::StyledWriter writer;
             Json::FastWriter writer;
             *json_string = writer.write(root);
+            search_cache->StoreResult(query, *json_string);
+        }
+
+        bool GetHotKeywords(
+            std::size_t limit,
+            std::vector<std::pair<std::string, double> > *keywords)
+        {
+            return search_cache->GetHotKeywords(limit, keywords);
         }
 
         std::string GetDesc(const std::string &html_content, const std::string &word)
