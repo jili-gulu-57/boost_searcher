@@ -1,0 +1,4 @@
+data/input/** linguist-generated=true
+data/raw_html/** linguist-generated=true
+cpp-httplib-0.27.0/** linguist-vendored
+cppjieba/** linguist-vendored

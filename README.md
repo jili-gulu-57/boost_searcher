@@ -1,5 +1,58 @@
 # Boost Searcher：C++ 本地搜索引擎
 
+## 项目结构
+
+| 路径 | 用途 |
+| --- | --- |
+| `parser.cc` | 遍历 HTML，提取标题、正文和链接 |
+| `index.hpp` | 构建正排索引、倒排索引 |
+| `searcher.hpp` | 查询分词、权重聚合、排序和 JSON 输出 |
+| `http_server.cc` | Boost.Beast HTTP 服务入口 |
+| `config.*`、`redis_client.*`、`search_cache.*` | Redis 配置、连接、缓存和热门词统计 |
+| `data/input/` | Boost HTML 搜索语料 |
+| `data/raw_html/raw.txt` | 清洗后的文档记录 |
+| `cppjieba/` | 分词库和词典，需要确认内容完整 |
+| `cpp-httplib-0.27.0/` | 仓库保留的第三方库 |
+
+## 首次使用准备
+
+推荐在 Linux 上构建运行。先获取项目：
+
+```bash
+git clone https://github.com/jili-gulu-57/boost_searcher.git
+cd boost_searcher
+```
+
+当前仓库中的 `cppjieba` 是 Git 子仓库引用，但缺少 `.gitmodules` 配置，普通克隆后可能没有库文件。可以将完整的 cppjieba 克隆到独立目录：
+
+```bash
+git clone --depth 1 https://github.com/yanyiwu/cppjieba.git ../cppjieba-dependency
+```
+
+随后按下文安装构建依赖，并使用以下配置：
+
+```bash
+cmake -S . -B build -DCPPJIEBA_ROOT=../cppjieba-dependency
+cmake --build build --parallel
+export SEARCHER_DICT_DIR="$(cd ../cppjieba-dependency/dict && pwd)"
+```
+
+若需要重新生成搜索数据，先确保 `data/input/` 中有 HTML 语料，然后从项目根目录运行：
+
+```bash
+mkdir -p data/raw_html
+./build/parser
+./build/search_server 8080 4
+```
+
+仓库已有 `data/raw_html/raw.txt` 时可以直接启动服务。程序默认使用相对路径读取数据，因此应始终从项目根目录启动。使用 Make 构建时，服务程序名为 `http_server`；CMake 构建时为 `build/search_server`。
+
+## GitHub 语言统计
+
+项目实现主要使用 C++。`data/input/` 中约九千个 HTML 文件是搜索语料，其体积远大于实现代码，因此 GitHub 曾显示约 97% HTML。根目录 `.gitattributes` 将语料和清洗数据标记为 `linguist-generated`，将第三方库标记为 `linguist-vendored`，使语言统计主要反映项目自身代码。
+
+该配置不会删除文件或改变程序运行逻辑。推送后需等待 GitHub 后台重新计算；`.gitignore` 不会影响已经跟踪的文件，也不能替代此配置。
+
 基于 C++14、Boost.Beast、cppjieba、正排索引和倒排索引实现的本地全文搜索服务。项目通过 HTTP 返回 JSON 搜索结果，并使用 Redis 缓存热点查询、统计热门搜索词。Redis 不可用时自动降级到原有本地倒排索引检索，不影响基础搜索能力。
 
 ## 核心链路
